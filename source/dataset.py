@@ -17,6 +17,9 @@ class MachineDataset(Dataset):
         count = 0
         # Iterate directory to find total number of samples in training data
         for path in os.listdir(self.segmented_audio_dir):
+            #ignore gitkeep file
+            if path == '.gitkeep':
+                continue
             if os.path.isfile(os.path.join(self.segmented_audio_dir, path)):
                 count += 1
         self.length = count
@@ -28,6 +31,9 @@ class MachineDataset(Dataset):
     def __getitem__(self, index):
         
         #load spectrogram from .npy numpy file
+        #ignore .gitkeep
+        if os.listdir(self.spectrogram_dir)[index] == '.gitkeep':
+            index += 1
         spectrogram_file = os.listdir(self.spectrogram_dir)[index]
         spectrogram = torch.from_numpy(np.load(os.path.join(self.spectrogram_dir, spectrogram_file)))
         spectrogram = spectrogram[0:1,:, :] #get single channel spectrogram slicing [0:1] to preserve dimensions
