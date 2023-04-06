@@ -9,4 +9,4 @@ dependencies:
   - pysoundfile
   - pydub
   - ffmpeg
-prefix: C:\Users\hause\miniconda3\envs\practical_work
+prefix: C:\Users\hause\miniconda3\envs\dcase2023
