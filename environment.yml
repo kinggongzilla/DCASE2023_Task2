@@ -1,0 +1,12 @@
+name: dcase2023
+channels:
+  - conda-forge
+  - defaults
+  - pytorch
+dependencies:
+  - jupyter
+  - torchaudio
+  - pysoundfile
+  - pydub
+  - ffmpeg
+prefix: C:\Users\hause\miniconda3\envs\practical_work
