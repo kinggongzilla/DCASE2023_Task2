@@ -1,0 +1,6 @@
+output/models/best_model.pt
+output/models/last_model.pt
+source/__pycache__/config.cpython-310.pyc
+source/__pycache__/dataset.cpython-310.pyc
+source/__pycache__/model.cpython-310.pyc
+source/__pycache__/train.cpython-310.pyc
