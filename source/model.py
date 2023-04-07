@@ -13,6 +13,8 @@ class CNNAutoencoder(nn.Module):
         self.conv3 = nn.Conv2d(8, 8, kernel_size=3)
         self.bn3 = nn.BatchNorm2d(8)
         
+        #compressed latent space size: (8, 74, 57), 8 channels, 74x57 pixels
+
         # Decoder
         self.t_conv1 = nn.ConvTranspose2d(8, 8, kernel_size=3)
         self.t_bn1 = nn.BatchNorm2d(8)
