@@ -1,6 +1,15 @@
-output/models/best_model.pt
-output/models/last_model.pt
+#ignore python cache files
 source/__pycache__/config.cpython-310.pyc
 source/__pycache__/dataset.cpython-310.pyc
 source/__pycache__/model.cpython-310.pyc
 source/__pycache__/train.cpython-310.pyc
+
+#ignore processed files
+data/processed/audio_segments/*.wav
+data/processed/spectrograms/*.npy
+
+#ignore raw folders
+data/raw/*
+
+#ignore model checkpoints
+output/models/*
