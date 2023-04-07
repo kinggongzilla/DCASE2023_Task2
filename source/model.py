@@ -4,6 +4,8 @@ from torch import nn
 class CNNAutoencoder(nn.Module):
     def __init__(self):
         super(CNNAutoencoder, self).__init__()
+
+        #input size: (1, 80, 63), 1 channel, 80x63 pixels
         
         # Encoder
         self.conv1 = nn.Conv2d(1, 16, kernel_size=3)
@@ -21,6 +23,9 @@ class CNNAutoencoder(nn.Module):
         self.t_conv2 = nn.ConvTranspose2d(8, 16, kernel_size=3)
         self.t_bn2 = nn.BatchNorm2d(16)
         self.t_conv3 = nn.ConvTranspose2d(16, 1, kernel_size=3)
+
+        #output size: (1, 80, 63), 1 channel, 80x63 pixels
+
 
     def forward(self, x):
         # Encoder
