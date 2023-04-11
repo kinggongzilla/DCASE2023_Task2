@@ -5,11 +5,13 @@ source/__pycache__/model.cpython-310.pyc
 source/__pycache__/train.cpython-310.pyc
 
 #ignore processed files
-data/processed/audio_segments/*.wav
-data/processed/spectrograms/*.npy
+data/processed/*
+data/processed/*
 
 #ignore raw folders
 data/raw/*
-
 #ignore model checkpoints
 output/models/*
+
+#ignore results
+results/*

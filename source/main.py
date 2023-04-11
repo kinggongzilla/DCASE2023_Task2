@@ -1,37 +1,46 @@
 import os
 import sys
 import torch
-import torch.nn.functional as F
+import numpy as np
 from torch.utils.data import Dataset
 from model import CNNAutoencoder
-from dataset import MachineDataset
+from dataset import MachineTrainDataset, MachineTestLoader
 from train import train
-from config import EPOCHS, BATCH_SIZE, LEARNING_RATE
+from test import test
+from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH
 
 #start with empty cache
 torch.cuda.empty_cache()
 
-#default data location
-spectrograms_path = os.path.join('data', 'processed', 'spectrograms')
-waveform_path = os.path.join('data', 'processed', 'audio_segments')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu\n')
+print(f'Using device: {device}\n\n')
 
-#example: python source/main.py path/to/data
-if len(sys.argv) > 1:
-    spectrograms_path = sys.argv[1]
+for machine_name in os.listdir(RAW_PATH):
+    if machine_name == '.gitkeep':
+        continue
 
-#initialize dataset
-data_loader = MachineDataset(spectrogram_dir=spectrograms_path, segmented_audio_dir=waveform_path)
+    print(f"Machine: {machine_name}\n")
 
-#initialize dataloader
-trainloader = torch.utils.data.DataLoader(
-    data_loader,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
+    train_set = MachineTrainDataset(machine_name)
+    train_loader = torch.utils.data.DataLoader(
+        train_set,
+        batch_size=BATCH_SIZE,
+        shuffle=True,
     )
 
-#initialize model
-model = CNNAutoencoder()
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    test_loader = MachineTestLoader(machine_name)
 
-#train model
-train(model, optimizer,trainloader, EPOCHS, LEARNING_RATE)
+    model = CNNAutoencoder()
+
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print(f'Total number of parameters: {params}\n') #print number of parameters
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
+    print("\nTraining\n")
+    train(model, optimizer, train_loader, machine_name)
+    print("\nTesting\n")
+    test(model, test_loader, machine_name)
+    print("\n\n")
+
