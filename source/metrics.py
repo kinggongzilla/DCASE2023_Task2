@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-from sklearn.metrics import roc_auc_score, confusion_matrix
+from sklearn.metrics import roc_auc_score, confusion_matrix, accuracy_score
 
 
 def metrics(anomaly_score_path, decison_result_path):
@@ -21,17 +21,18 @@ def metrics(anomaly_score_path, decison_result_path):
     y_preds = y[:, 0]
     y_trues = y[:, 1]
     anomalies = y[:, 2]
+    accurracy = accuracy_score(y_trues, y_preds)
     auc = roc_auc_score(y_trues, anomalies)
     p_auc = roc_auc_score(y_trues, anomalies, max_fpr=0.1)
     tn_s, fp_s, fn_s, tp_s = confusion_matrix(y_trues, y_preds).ravel()
     prec = tp_s / np.maximum(tp_s + fp_s, sys.float_info.epsilon)
     recall = tp_s / np.maximum(tp_s + fn_s, sys.float_info.epsilon)
     f1 = 2.0 * prec * recall / np.maximum(prec + recall, sys.float_info.epsilon)
-    return auc, p_auc, prec, recall, f1
+    return accurracy, auc, p_auc, prec, recall, f1
 
 
 
 if __name__ == '__main__':
     ANOMALY_SCORE_PATH = 'results/bearing/anomaly_score_bearing_section_0.csv'
     DECISION_RESULT_PATH = 'results/bearing/decision_result_bearing_section_0.csv'
-    auc, pauc, prec, recall, f1 = metrics(ANOMALY_SCORE_PATH, DECISION_RESULT_PATH)
+    accuracy, auc, pauc, prec, recall, f1 = metrics(ANOMALY_SCORE_PATH, DECISION_RESULT_PATH)
