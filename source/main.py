@@ -53,7 +53,7 @@ for machine_name in os.listdir(RAW_PATH):
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     print("\nTraining\n")
-    train(model, optimizer, train_loader, machine_name)
+    train(model, optimizer, train_loader, test_loader, machine_name)
     print("\nTesting\n")
     test(model, test_loader, machine_name)
     print("\n\n")

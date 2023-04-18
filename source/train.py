@@ -4,9 +4,11 @@ from tqdm import tqdm
 from config import EPOCHS, MODEL_PATH
 import os
 import wandb
+from test import test
+from metrics import metrics
 
 
-def train(model, optimizer, train_loader, machine_name):
+def train(model, optimizer, train_loader, test_loader, machine_name):
 
     save_path = os.path.join(MODEL_PATH, machine_name)
     os.makedirs(save_path, exist_ok=True)
@@ -50,6 +52,15 @@ def train(model, optimizer, train_loader, machine_name):
             best_loss = epoch_loss
             torch.save(model.state_dict(), save_path)
         print(f'epoch: {epoch} | loss: {epoch_loss}')
+
+        #log area under the curve every 10 epochs
+        if epoch % 10 == 0:
+            model.load_state_dict(torch.load(save_path))
+            model.eval()
+            model.to(device)
+            test(model, test_loader, machine_name)
+            model.train()
+            
 
     torch.save(model.state_dict(), save_path)
 
