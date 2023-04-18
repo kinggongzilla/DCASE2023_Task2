@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 from config import EPOCHS, MODEL_PATH
 import os
+import wandb
 
 
 def train(model, optimizer, train_loader, machine_name):
@@ -41,6 +42,8 @@ def train(model, optimizer, train_loader, machine_name):
 
         # normalize epoch_loss by total number of samples
         epoch_loss = epoch_loss/len(train_loader)
+        wandb.log({"epoch_loss": epoch_loss})
+
 
         #save model if loss is new best loss
         if epoch_loss < best_loss:

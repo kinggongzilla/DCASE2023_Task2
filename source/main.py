@@ -3,17 +3,30 @@ import sys
 import torch
 import numpy as np
 from torch.utils.data import Dataset
+import wandb
 from model import CNNAutoencoder
 from dataset import MachineTrainDataset, MachineTestLoader
 from train import train
 from test import test
-from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH, RESULT_PATH
+from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH, RESULT_PATH, EPOCHS
 from metrics import metrics_data, overall_score
 
 #start with empty cache
 torch.cuda.empty_cache()
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu\n')
+
+#initialize wandb
+wandb.init(
+    project="dcase2023_task2", 
+    entity="dcasetask2",
+    config = {
+    "learning_rate": LEARNING_RATE,
+    "epochs": EPOCHS,
+    "batch_size": BATCH_SIZE,
+    }
+)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}\n\n')
 
 for machine_name in os.listdir(RAW_PATH):
