@@ -7,7 +7,8 @@ from model import CNNAutoencoder
 from dataset import MachineTrainDataset, MachineTestLoader
 from train import train
 from test import test
-from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH
+from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH, RESULT_PATH
+from metrics import metrics_data, overall_score
 
 #start with empty cache
 torch.cuda.empty_cache()
@@ -43,4 +44,7 @@ for machine_name in os.listdir(RAW_PATH):
     print("\nTesting\n")
     test(model, test_loader, machine_name)
     print("\n\n")
+    print(f"overall_score:{overall_score(RESULT_PATH)}")
+    df = metrics_data(RESULT_PATH)
+    df.to_csv('results/metrics.csv')
 

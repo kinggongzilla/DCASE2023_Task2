@@ -10,9 +10,9 @@ from tqdm import tqdm
 
 def transform_to_spectrogram(in_file_path, out_dir):
     if not os.path.exists(out_dir):
-        raise 'out_dir does not exist'
+        raise f'out_dir {out_dir} does not exist'
     if not os.path.isfile(in_file_path):
-        raise 'given in_path is not a file'
+        raise f'given in_path {in_file_path} is not a file'
 
     audio = torchaudio.load(in_file_path)[0]
     mel_spectrogram = torchaudio.transforms.MelSpectrogram(
