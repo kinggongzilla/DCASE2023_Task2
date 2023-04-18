@@ -54,7 +54,7 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
         print(f'epoch: {epoch} | loss: {epoch_loss}')
 
         #log area under the curve every 10 epochs
-        if epoch % 10 == 0:
+        if epoch % 2 == 0:
             model.load_state_dict(torch.load(save_path))
             model.eval()
             model.to(device)

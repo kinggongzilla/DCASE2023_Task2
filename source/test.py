@@ -20,10 +20,12 @@ def test(model, test_loader, machine_name):
 
     # Get a sorted list of file names in the relevant directory
     file_names = sorted(os.listdir(os.path.join(RAW_PATH, machine_name, "test")))
+    anomaly_score_path = os.path.join(RESULTS_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv')
+    decision_result_path = os.path.join(RESULTS_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv')
 
-    with open(os.path.join(RESULTS_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv'), 'w', newline='\n') as _:
+    with open(anomaly_score_path, 'w', newline='\n') as _:
         pass
-    with open(os.path.join(RESULTS_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv'), 'w', newline='\n') as _:
+    with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
     for (spectrograms, waveforms, indices, domains, labels) in tqdm(test_loader):
@@ -47,8 +49,6 @@ def test(model, test_loader, machine_name):
         # Get the filename for the current iteration
         file_name = file_names[index]
 
-        anomaly_score_path = os.path.join(RESULTS_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv')
-        decision_result_path = os.path.join(RESULTS_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv')
 
         # Write the anomaly score and prediction to the CSV files
         with open(anomaly_score_path, 'a', newline='\n') as f:
@@ -58,10 +58,13 @@ def test(model, test_loader, machine_name):
         with open(decision_result_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
             writer.writerow([file_name, prediction])
-
+    try:
         accurracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
 
         wandb.log({f"{machine_name}_auc": auc})
         wandb.log({f"{machine_name}_accurracy": accurracy})
+    except:
+        print("logging was not possible")
+
 
 
