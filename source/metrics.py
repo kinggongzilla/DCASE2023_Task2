@@ -63,10 +63,10 @@ def metrics_data(resultspath):
                     anomaly_score_path = os.path.join(os.path.join(resultspath, dir_name), file)
                 if 'decision_result' in file:
                     decision_result_path = os.path.join(os.path.join(resultspath, dir_name), file)
-        if anomaly_score_path and decision_result_path is not None:
-            accuracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
-        else:
-            raise f'{os.path.join(resultspath, dir_name)} does not contain anomaly_score or decision_results file'
+            if anomaly_score_path and decision_result_path is not None:
+                accuracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
+            else:
+                raise f'{os.path.join(resultspath, dir_name)} does not contain anomaly_score or decision_results file'
         df = df.append({"machine": dir_name, "accuracy": accuracy, "auc": auc, "p_auc": p_auc, "precision": prec, "recall": recall, "f1": f1},
                        ignore_index=True)
     return df
@@ -94,10 +94,10 @@ def overall_score(resultspath):
                     anomaly_score_path = os.path.join(os.path.join(resultspath, dir_name), file)
                 if 'decision_result' in file:
                     decision_result_path = os.path.join(os.path.join(resultspath, dir_name), file)
-        if anomaly_score_path and decision_result_path is not None:
-            accuracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
-        else:
-            raise f'{os.path.join(resultspath, dir_name)} does not contain anomaly_score or decision_results file'
+            if anomaly_score_path and decision_result_path is not None:
+                accuracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
+            else:
+                raise f'{os.path.join(resultspath, dir_name)} does not contain anomaly_score or decision_results file'
         pauc_auc_list.append(auc)
         pauc_auc_list.append(p_auc)
     return harmonic_mean(pauc_auc_list)

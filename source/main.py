@@ -44,7 +44,8 @@ for machine_name in os.listdir(RAW_PATH):
     print("\nTesting\n")
     test(model, test_loader, machine_name)
     print("\n\n")
-    print(f"overall_score:{overall_score(RESULT_PATH)}")
-    df = metrics_data(RESULT_PATH)
-    df.to_csv('results/metrics.csv')
+
+print(f"overall_score:{overall_score(RESULT_PATH)}")
+df = metrics_data(RESULT_PATH)
+df.to_csv('results/metrics.csv')
 
