@@ -42,7 +42,7 @@ def train(model, optimizer, train_loader, machine_name):
 
         # normalize epoch_loss by total number of samples
         epoch_loss = epoch_loss/len(train_loader)
-        wandb.log({"epoch_loss": epoch_loss})
+        wandb.log({f"{machine_name}_epoch_loss": epoch_loss})
 
 
         #save model if loss is new best loss
