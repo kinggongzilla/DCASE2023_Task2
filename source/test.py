@@ -37,8 +37,6 @@ def test(model, test_loader, machine_name):
         y = model.forward(x)
 
         anomaly_score = loss_func(y, x).view(-1).sum().item()/len(indices)
-        #log anomaly score in wandb
-        wandb.log({f"{machine_name}_anomaly_score": anomaly_score})
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY
