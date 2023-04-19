@@ -29,11 +29,10 @@ By default, when using source/data_prep.py, full length audio files are segmente
    The results follow the official submission format:
    "anomaly_score_<machine_type>_section_<section_index>.csv" with rows: "[filename (string)],[anomaly score (real value)]"
    "decision_result_<machine_type>_section_<section_index>.csv" with rows "[filename (string)],[decision result (0: normal, 1: anomaly)]"
+Every 5 epochs accurracy (which is not really meaningful right now) as well aus auc is tracked with weight and biases as well as in the end all metrics are computed and saved to results/metrics.csv
 
 # TBD in the future
-1. From the generated files all scoring metrics can be computed (see Figure 3: Task overview). 
-   Implement a function which computes basic performance metrics (Accuracy...) and most importantly AUC, pAUC (harmonic mean of them) to be called after the two eval files for a machine have been created
-2. Find reasonable choices for the anomaly score detection threshold (for each machine). 
-   For now this is set to a fixed value in the configs DETECTION_TRESHOLD_DICT 
-3. If the full evaluation pipeline is done, we can start comparing to the baselines/previous years scores and improve the model
+1. Find reasonable choices for the anomaly score detection threshold (for each machine). This will also be model dependent!
+   For now this is set to a fixed value in the configs DETECTION_TRESHOLD_DICT
+2. If the full evaluation pipeline is done, we can start comparing to the baselines/previous years scores and improve the model
 
