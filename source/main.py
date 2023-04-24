@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from torch.utils.data import Dataset
 import wandb
-from model import CNNAutoencoder
+from model import UNet
 from dataset import MachineTrainDataset, MachineTestLoader
 from train import train
 from test import test
@@ -44,7 +44,7 @@ for machine_name in os.listdir(RAW_PATH):
 
     test_loader = MachineTestLoader(machine_name)
 
-    model = CNNAutoencoder()
+    model = UNet()
 
     model_parameters = filter(lambda p: p.requires_grad, model.parameters())
     params = sum([np.prod(p.size()) for p in model_parameters])
