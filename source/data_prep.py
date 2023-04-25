@@ -15,21 +15,17 @@ def transform_to_spectrogram(in_file_path, out_dir):
         raise f'given in_path {in_file_path} is not a file'
 
     audio = torchaudio.load(in_file_path)[0]
-    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
-        sample_rate=SAMPLE_RATE,
+    log_spectrogram = torchaudio.transforms.Spectrogram(
         win_length=WINDOW_LENGTH,
         hop_length=HOP_LENGTH,
         n_fft=N_FFT,
-        f_min=FMIN,
-        f_max=FMAX,
-        n_mels=N_MELS,
         power=POWER,
         normalized=NORMALIZED)(audio)
 
-    mel_spectrogram = 20 * torch.log10(torch.clamp(mel_spectrogram, min=1e-5)) - 20
-    mel_spectrogram = torch.clamp((mel_spectrogram + 100) / 100, 0.0, 1.0)
+    log_spectrogram = 20 * torch.log10(torch.clamp(log_spectrogram, min=1e-5)) - 20
+    log_spectrogram = torch.clamp((log_spectrogram + 100) / 100, 0.0, 1.0)
     file_name = os.path.basename(in_file_path)
-    np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), mel_spectrogram.cpu().numpy())
+    np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), log_spectrogram.cpu().numpy())
 
 
 #load data of one wav and split it into chunks
