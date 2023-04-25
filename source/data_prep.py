@@ -21,7 +21,6 @@ def transform_to_spectrogram(in_file_path, out_dir):
         n_fft=N_FFT,
         power=POWER,
         normalized=NORMALIZED)(audio)
-
     log_spectrogram = 20 * torch.log10(torch.clamp(log_spectrogram, min=1e-5)) - 20
     log_spectrogram = torch.clamp((log_spectrogram + 100) / 100, 0.0, 1.0)
     file_name = os.path.basename(in_file_path)

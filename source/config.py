@@ -29,8 +29,6 @@ DETECTION_TRESHOLD_DICT = dict(
 
 # if reconstruction loss is higher than this --> consider sample an anomaly
 
-# DATA PREP SETTINGS
-
 SAMPLE_LENGTH_SECONDS = 1
 WINDOW_LENGTH = 124
 HOP_LENGTH = 256
