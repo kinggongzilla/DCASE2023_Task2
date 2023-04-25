@@ -28,16 +28,17 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
 
         epoch_loss = 0
 
-        for spectrograms, waveforms, indices, domains, labels in tqdm(train_loader):
+        for masked_spectrograms, spectrograms, in tqdm(train_loader):
 
             step_count += 1
             optimizer.zero_grad()
 
-            x = spectrograms.to(device)
-            y = model.forward(x)
+            inputs = masked_spectrograms.to(device)
+            targets = spectrograms.to(device)
 
-            #calculate loss, barward pass and optimizer step
-            batch_loss = loss_func(y, x)
+            outputs = model.forward(inputs)
+
+            batch_loss = loss_func(outputs, targets)
             batch_loss.backward()
             optimizer.step()
             epoch_loss += float(batch_loss.item())

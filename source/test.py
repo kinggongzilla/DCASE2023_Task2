@@ -28,18 +28,14 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
-    for (spectrograms, waveforms, indices, domains, labels) in tqdm(test_loader):
+    for index, (masked_spectrograms, spectrograms) in tqdm(enumerate(test_loader)):
 
-        # batch holds all segments of one test sample
-        # indices, domains, labels hold the same values for the test batches.
-        index = indices[0]
-        domain = domains[0]
-        label = labels[0]
+        inputs = masked_spectrograms.to(device)
+        targets = spectrograms.to(device)
 
-        x = spectrograms.to(device)
-        y = model.forward(x)
+        outputs = model.forward(inputs)
 
-        anomaly_score = loss_func(y, x).view(-1).sum().item()/len(indices)
+        anomaly_score = loss_func(outputs, targets).view(-1).sum().item()/len(masked_spectrograms)
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY

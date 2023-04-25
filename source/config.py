@@ -16,6 +16,7 @@ EPOCHS = 10
 MODEL_PATH = 'models'
 RESULTS_PATH = 'results'
 
+
 DETECTION_TRESHOLD_DICT = dict(
     bearing=0.001,
     fan=0.001,
@@ -29,6 +30,7 @@ DETECTION_TRESHOLD_DICT = dict(
 # if reconstruction loss is higher than this --> consider sample an anomaly
 
 # DATA PREP SETTINGS
+
 SAMPLE_LENGTH_SECONDS = 1
 WINDOW_LENGTH = 1024
 HOP_LENGTH = 256
@@ -38,10 +40,12 @@ FMIN = 20.0
 FMAX = SAMPLE_RATE / 2
 POWER = 1.0
 NORMALIZED = True
-PARENT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+PATCH_SIZE = 8
+NUM_PATCHES_TO_ZERO = 48
+
+PARENT_PATH = os.path.abspath(os.path.join(os.getcwd()))
 DATA_PATH = os.path.join(PARENT_PATH, 'data')
 RAW_PATH = os.path.join(DATA_PATH, 'raw')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed')
 SPECTROGRAMS_PATH = os.path.join(PROCESSED_PATH, 'spectrograms')
-AUDIO_SEGMENTS_PATH = os.path.join(PROCESSED_PATH, 'audio_segments')
 RESULT_PATH = 'results'

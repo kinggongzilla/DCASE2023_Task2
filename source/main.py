@@ -5,7 +5,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import wandb
 from model import UNet
-from dataset import MachineTrainDataset, MachineTestLoader
+from datasets import MachineTrainDataset, MachineTestLoader
 from train import train
 from test import test
 from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH, RESULT_PATH, EPOCHS
