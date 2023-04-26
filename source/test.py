@@ -29,6 +29,8 @@ def test(model, test_loader, machine_name):
         pass
 
     for index, (masked_spectrograms, spectrograms) in tqdm(enumerate(test_loader)):
+        if index >= len(file_names):
+            break
 
         inputs = masked_spectrograms.to(device)
         targets = spectrograms.to(device)

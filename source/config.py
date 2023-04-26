@@ -9,10 +9,10 @@ IS_SOURCE = 0
 IS_TARGET = 1
 
 # MODEL SETTINGS
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 SAMPLE_RATE = 22500  # 22.5kHz
 LEARNING_RATE = 1e-4
-EPOCHS = 10
+EPOCHS = 100
 MODEL_PATH = 'models'
 RESULTS_PATH = 'results'
 
@@ -32,7 +32,7 @@ DETECTION_TRESHOLD_DICT = dict(
 SAMPLE_LENGTH_SECONDS = 1
 WINDOW_LENGTH = 124
 HOP_LENGTH = 256
-N_FFT = 124
+N_FFT = 400
 N_MELS = 80
 FMIN = 20.0
 FMAX = SAMPLE_RATE / 2
@@ -41,7 +41,7 @@ NORMALIZED = True
 PATCH_SIZE = 8
 NUM_PATCHES_TO_ZERO = 48
 
-PARENT_PATH = os.path.abspath(os.path.join(os.getcwd()))
+PARENT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 DATA_PATH = os.path.join(PARENT_PATH, 'data')
 RAW_PATH = os.path.join(DATA_PATH, 'raw')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed')
