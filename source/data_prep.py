@@ -17,32 +17,31 @@ def transform_to_spectrogram(in_file_path, out_dir):
     if not os.path.isfile(in_file_path):
         raise f'given in_path {in_file_path} is not a file'
 
+    # Load the waveform and resample if needed
     waveform, sample_rate = torchaudio.load(in_file_path)
-
-    target_sample_rate = SAMPLE_RATE
+    target_sample_rate = 22500
     if sample_rate != target_sample_rate:
         resampler = T.Resample(sample_rate, target_sample_rate)
         waveform = resampler(waveform)
 
+    # Create a MelSpectrogram object
+    n_fft = 400
+    n_mels = 128 # You can change this value if you want
+    mel_spectrogram_transform = T.MelSpectrogram(sample_rate=target_sample_rate, n_fft=n_fft, n_mels=n_mels)
 
+    # Apply the MelSpectrogram transformation
+    mel_spectrogram = mel_spectrogram_transform(waveform)
 
-    # Create a Spectrogram object
-    n_fft = N_FFT
-    spectrogram_transform = T.Spectrogram(n_fft=n_fft, normalized=True)
-
-    # Apply the Spectrogram transformation
-    spectrogram = spectrogram_transform(waveform)
-
-    # Resize the resulting spectrogram
+    # Resize the resulting mel spectrogram
     target_size = (1, 64, 64)
-    log_spectrogram = interpolate(spectrogram.unsqueeze(0), size=target_size[1:], mode="bilinear").squeeze(0)
+    log_mel_spectrogram = interpolate(mel_spectrogram.unsqueeze(0), size=target_size[1:], mode="bilinear").squeeze(0)
 
-    log_spectrogram = 20 * torch.log10(torch.clamp(log_spectrogram, min=1e-5)) - 20
-    log_spectrogram = torch.clamp((log_spectrogram + 100) / 100, 0.0, 1.0)
+    log_mel_spectrogram = 20 * torch.log10(torch.clamp(log_mel_spectrogram, min=1e-5)) - 20
+    log_mel_spectrogram = torch.clamp((log_mel_spectrogram + 100) / 100, 0.0, 1.0)
 
 
     file_name = os.path.basename(in_file_path)
-    np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), log_spectrogram.cpu().numpy())
+    np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), log_mel_spectrogram.cpu().numpy())
 
 
 if __name__ == '__main__':
