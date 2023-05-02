@@ -12,7 +12,7 @@ IS_TARGET = 1
 BATCH_SIZE = 128
 SAMPLE_RATE = 22500  # 22.5kHz
 LEARNING_RATE = 1e-4
-EPOCHS = 100
+EPOCHS = 10000
 MODEL_PATH = 'models'
 RESULTS_PATH = 'results'
 
@@ -44,7 +44,7 @@ NUM_PATCHES_TO_ZERO = 48
 
 
 PARENT_PATH = os.path.abspath(os.getcwd())
-DATA_PATH = os.path.join(PARENT_PATH, 'data')
+DATA_PATH = os.environ.get("DATA_PATH", os.path.join(PARENT_PATH, 'data'))
 RAW_PATH = os.path.join(DATA_PATH, 'raw')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed')
 SPECTROGRAMS_PATH = os.path.join(PROCESSED_PATH, 'spectrograms')
