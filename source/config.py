@@ -17,6 +17,7 @@ MODEL_PATH = 'models'
 RESULTS_PATH = 'results'
 
 
+
 DETECTION_TRESHOLD_DICT = dict(
     bearing=0.001,
     fan=0.001,
@@ -41,7 +42,8 @@ NORMALIZED = True
 PATCH_SIZE = 8
 NUM_PATCHES_TO_ZERO = 48
 
-PARENT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+PARENT_PATH = os.path.abspath(os.getcwd())
 DATA_PATH = os.path.join(PARENT_PATH, 'data')
 RAW_PATH = os.path.join(DATA_PATH, 'raw')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed')

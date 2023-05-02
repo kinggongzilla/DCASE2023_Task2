@@ -30,6 +30,9 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
 
         for masked_spectrograms, spectrograms, in tqdm(train_loader):
 
+            #masked_example = masked_spectrograms[0][0].numpy()
+            #unmasked_example = spectrograms[0][0].numpy()
+
             step_count += 1
             optimizer.zero_grad()
 

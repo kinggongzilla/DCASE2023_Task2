@@ -16,6 +16,7 @@ torch.cuda.empty_cache()
 
 
 #initialize wandb
+
 wandb.init(
     project="dcase2023_task2", 
     entity="dcasetask2",
@@ -25,6 +26,7 @@ wandb.init(
     "batch_size": BATCH_SIZE,
     }
 )
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}\n\n')

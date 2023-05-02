@@ -33,13 +33,25 @@ def transform_to_spectrogram(in_file_path, out_dir):
     # Apply the Spectrogram transformation
     spectrogram = spectrogram_transform(waveform)
 
+    temp_spectrogram = spectrogram[0].numpy()
+
     # Resize the resulting spectrogram
     target_size = (1, 64, 64)
     log_spectrogram = interpolate(spectrogram.unsqueeze(0), size=target_size[1:], mode="bilinear").squeeze(0)
 
-    log_spectrogram = 20 * torch.log10(torch.clamp(log_spectrogram, min=1e-5)) - 20
-    log_spectrogram = torch.clamp((log_spectrogram + 100) / 100, 0.0, 1.0)
+    temp_log_spectrogram1 = np.copy(log_spectrogram[0])
 
+    # Calculate the mean and standard deviation
+    mean = log_spectrogram.mean(dim=2)
+    std = log_spectrogram.std(dim=2)
+
+    # Normalize the log_spectrogram
+    log_spectrogram[0] = (log_spectrogram[0] - mean) / std
+
+    #log_spectrogram = 20 * torch.log10(torch.clamp(log_spectrogram, min=1e-5)) - 20
+    #log_spectrogram = torch.clamp((log_spectrogram + 100) / 100, 0.0, 1.0)
+
+    temp_log_spectrogram2 = np.copy(log_spectrogram[0])
 
     file_name = os.path.basename(in_file_path)
     np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), log_spectrogram.cpu().numpy())
