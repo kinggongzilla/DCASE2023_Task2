@@ -28,7 +28,7 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
-    for index, (masked_spectrograms, spectrograms) in tqdm(enumerate(test_loader)):
+    for index, (masked_spectrograms, spectrograms, labels) in tqdm(enumerate(test_loader)):
         if index >= len(file_names):
             break
 
@@ -38,6 +38,16 @@ def test(model, test_loader, machine_name):
         outputs = model.forward(inputs)
 
         anomaly_score = loss_func(outputs, targets).view(-1).sum().item()/len(masked_spectrograms)
+
+        # log loss to wandb
+        wandb.log({f"{machine_name}_reconstr_loss": anomaly_score})
+
+        # log loss separately for normal and anomaly
+        if labels[0] == 1: # 1 == anomaly
+            wandb.log({f"{machine_name}_reconstr_loss_anomaly": anomaly_score})
+        else:
+            wandb.log({f"{machine_name}_reconstr_loss_normal": anomaly_score})
+
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY
