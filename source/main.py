@@ -42,6 +42,7 @@ for machine_name in os.listdir(RAW_PATH):
         train_set,
         batch_size=BATCH_SIZE,
         shuffle=True,
+        num_workers=4,
     )
 
     test_loader = MachineTestLoader(machine_name)

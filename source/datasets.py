@@ -96,10 +96,10 @@ class MachineTestLoader:
             label = 0
 
         # Convert the list of masked_spectrograms to a torch tensor stacked along 0-dim
-        masks = torch.stack([torch.tensor(mask) for mask in masks])
+        masks = torch.stack([torch.tensor(mask).clone() for mask in masks])
 
         # Duplicate "BATCH_SIZE" times the same spectrogram along 0-dim (using torch)
-        spectrograms = torch.stack([torch.tensor(spectrogram) for _ in range(BATCH_SIZE)])
+        spectrograms = torch.stack([torch.tensor(spectrogram).clone() for _ in range(BATCH_SIZE)])
 
         #duplicate lables "bATCHES_SIZE" times as torch tensor
         labels = torch.stack([torch.tensor(label) for _ in range(BATCH_SIZE)])
