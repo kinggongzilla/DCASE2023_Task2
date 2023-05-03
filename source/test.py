@@ -28,6 +28,7 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
+    reconstr_losses = []
     reconstr_losses_anomaly = []
     reconstr_losses_normal = []
 
@@ -44,8 +45,7 @@ def test(model, test_loader, machine_name):
 
         anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0]).view(-1).sum().item()/len(spectrograms)
 
-        # log loss to wandb
-        wandb.log({f"{machine_name}_reconstr_loss": anomaly_score})
+        reconstr_losses.append(anomaly_score)
 
         # log loss separately for normal and anomaly
         if labels[0] == IS_ANOMALY:
@@ -71,7 +71,7 @@ def test(model, test_loader, machine_name):
             writer = csv.writer(f)
             writer.writerow([file_name, prediction])
 
-
+    wandb.log({f"{machine_name}_reconstr_loss": np.mean(np.array([reconstr_losses]))})
     wandb.log({f"{machine_name}_reconstr_loss_anomaly": np.mean(np.array([reconstr_losses_anomaly]))})
     wandb.log({f"{machine_name}_reconstr_loss_normal": np.mean(np.array([reconstr_losses_normal]))})
 
