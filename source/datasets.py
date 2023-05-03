@@ -32,11 +32,11 @@ def random_mask(spectrogram, patch_size=PATCH_SIZE, num_patches_to_zero=NUM_PATC
     selected_patches = patches[:num_patches_to_zero]
 
     # Set the values in the selected patches to zero
-    masked_spectrogram = np.copy(spectrogram)
+    mask = np.ones(spectrogram.shape)
     for (i, j) in selected_patches:
-        masked_spectrogram[0, i:i+patch_size, j:j+patch_size] = 0
+        mask[0, i:i+patch_size, j:j+patch_size] = 0
 
-    return masked_spectrogram
+    return mask
 
 
 def get_spectrogram(spectrogram_file_path):
@@ -57,8 +57,9 @@ class MachineTrainDataset(Dataset):
         spectrogram_file_name = self.spectrograms_file_names[index]
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
         spectrogram = get_spectrogram(spectrogram_file_path)
-        masked_spectrogram = random_mask(spectrogram)
-        return masked_spectrogram, spectrogram
+        mask = random_mask(spectrogram)
+        return mask, spectrogram
+
 
 class MachineTestLoader:
     """
@@ -86,7 +87,7 @@ class MachineTestLoader:
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
 
         spectrogram = get_spectrogram(spectrogram_file_path)
-        masked_spectrograms = [random_mask(spectrogram) for _ in range(BATCH_SIZE)]
+        masks = [random_mask(spectrogram) for _ in range(BATCH_SIZE)]
 
         #extract label from file name: index=0__segment_id=0__domain=source__label=anomaly.spec.npy
         if 'anomaly' in spectrogram_file_name:
@@ -95,7 +96,7 @@ class MachineTestLoader:
             label = 0
 
         # Convert the list of masked_spectrograms to a torch tensor stacked along 0-dim
-        masked_spectrograms = torch.stack([torch.tensor(masked_spectrogram) for masked_spectrogram in masked_spectrograms])
+        masks = torch.stack([torch.tensor(mask) for mask in masks])
 
         # Duplicate "BATCH_SIZE" times the same spectrogram along 0-dim (using torch)
         spectrograms = torch.stack([torch.tensor(spectrogram) for _ in range(BATCH_SIZE)])
@@ -103,4 +104,4 @@ class MachineTestLoader:
         #duplicate lables "bATCHES_SIZE" times as torch tensor
         labels = torch.stack([torch.tensor(label) for _ in range(BATCH_SIZE)])
 
-        return masked_spectrograms, spectrograms, labels
+        return masks, spectrograms, labels

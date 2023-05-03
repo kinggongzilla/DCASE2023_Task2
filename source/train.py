@@ -28,20 +28,19 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
 
         epoch_loss = 0
 
-        for masked_spectrograms, spectrograms, in tqdm(train_loader):
-
-            #masked_example = masked_spectrograms[0][0].numpy()
-            #unmasked_example = spectrograms[0][0].numpy()
+        for masks, spectrograms, in tqdm(train_loader):
 
             step_count += 1
             optimizer.zero_grad()
 
+            masked_spectrograms = spectrograms.clone()
+            masked_spectrograms[masks == 0] = 0
+
             inputs = masked_spectrograms.to(device)
             targets = spectrograms.to(device)
-
             outputs = model.forward(inputs)
 
-            batch_loss = loss_func(outputs, targets)
+            batch_loss = loss_func(outputs[masks == 0], targets[masks == 0])
             batch_loss.backward()
             optimizer.step()
             epoch_loss += float(batch_loss.item())

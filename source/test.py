@@ -28,16 +28,18 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
-    for index, (masked_spectrograms, spectrograms, labels) in tqdm(enumerate(test_loader)):
+    for index, (masks, spectrograms, labels) in tqdm(enumerate(test_loader)):
         if index >= len(file_names):
             break
 
+        masked_spectrograms = spectrograms.clone()
+        masked_spectrograms[masks == 0] = 0
+
         inputs = masked_spectrograms.to(device)
         targets = spectrograms.to(device)
-
         outputs = model.forward(inputs)
 
-        anomaly_score = loss_func(outputs, targets).view(-1).sum().item()/len(masked_spectrograms)
+        anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0]).view(-1).sum().item()/len(spectrograms)
 
         # log loss to wandb
         wandb.log({f"{machine_name}_reconstr_loss": anomaly_score})
