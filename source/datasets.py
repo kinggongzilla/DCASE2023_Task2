@@ -81,6 +81,7 @@ class MachineTestLoader:
     def __next__(self):
 
         if self.index > self.__len__()-1:
+            self.index = 0
             raise StopIteration
 
         spectrogram_file_name = self.spectrograms_file_names[self.index]
