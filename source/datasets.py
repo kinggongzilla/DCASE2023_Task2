@@ -104,4 +104,6 @@ class MachineTestLoader:
         #duplicate lables "bATCHES_SIZE" times as torch tensor
         labels = torch.stack([torch.tensor(label) for _ in range(BATCH_SIZE)])
 
+        self.index += 1
+
         return masks, spectrograms, labels
