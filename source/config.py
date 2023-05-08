@@ -48,4 +48,4 @@ DATA_PATH = os.environ.get("DATA_PATH", os.path.join(PARENT_PATH, 'data'))
 RAW_PATH = os.path.join(DATA_PATH, 'raw')
 PROCESSED_PATH = os.path.join(DATA_PATH, 'processed')
 SPECTROGRAMS_PATH = os.path.join(PROCESSED_PATH, 'spectrograms')
-RESULT_PATH = 'results'
+RESULT_PATH = os.environ.get("RESULT_PATH", os.path.join(PARENT_PATH, 'result'))
