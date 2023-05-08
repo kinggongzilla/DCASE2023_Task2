@@ -4,12 +4,12 @@ import torch
 import numpy as np
 import wandb
 from tqdm import tqdm
-from config import RESULTS_PATH, RAW_PATH, DETECTION_TRESHOLD_DICT, IS_ANOMALY, IS_NORMAL
+from config import *
 from metrics import metrics
 
 def test(model, test_loader, machine_name):
 
-    os.makedirs(os.path.join(RESULTS_PATH, machine_name), exist_ok=True)
+    os.makedirs(os.path.join(RESULT_PATH, machine_name), exist_ok=True)
 
     loss_func = torch.nn.MSELoss()
 
@@ -20,8 +20,8 @@ def test(model, test_loader, machine_name):
 
     # Get a sorted list of file names in the relevant directory
     file_names = sorted(os.listdir(os.path.join(RAW_PATH, machine_name, "test")))
-    anomaly_score_path = os.path.join(RESULTS_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv')
-    decision_result_path = os.path.join(RESULTS_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv')
+    anomaly_score_path = os.path.join(RESULT_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv')
+    decision_result_path = os.path.join(RESULT_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv')
 
     with open(anomaly_score_path, 'w', newline='\n') as _:
         pass

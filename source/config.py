@@ -14,9 +14,6 @@ SAMPLE_RATE = 22500  # 22.5kHz
 LEARNING_RATE = 1e-4
 EPOCHS = 10
 MODEL_PATH = 'models'
-RESULTS_PATH = 'results'
-
-
 
 DETECTION_TRESHOLD_DICT = dict(
     bearing=0.001,
