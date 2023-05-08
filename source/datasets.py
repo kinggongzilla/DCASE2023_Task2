@@ -66,8 +66,9 @@ class MachineTestLoader:
     """
     Creates a batch for each original audio file
     """
-    def __init__(self, machine_name):
+    def __init__(self, machine_name, batch_size):
         self.index = 0
+        self.batch_size = batch_size
         self.machine_name = machine_name
         self.spectrograms_folder_path = os.path.join(SPECTROGRAMS_PATH, machine_name, "test")
         self.spectrograms_file_names = sorted(os.listdir(self.spectrograms_folder_path))
@@ -89,7 +90,7 @@ class MachineTestLoader:
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
 
         spectrogram = get_spectrogram(spectrogram_file_path)
-        masks = [random_mask(spectrogram) for _ in range(BATCH_SIZE)]
+        masks = [random_mask(spectrogram) for _ in range(self.batch_size)]
 
         #extract label from file name: index=0__segment_id=0__domain=source__label=anomaly.spec.npy
         if 'anomaly' in spectrogram_file_name:
@@ -101,10 +102,10 @@ class MachineTestLoader:
         masks = torch.stack([torch.tensor(mask).clone() for mask in masks])
 
         # Duplicate "BATCH_SIZE" times the same spectrogram along 0-dim (using torch)
-        spectrograms = torch.stack([torch.tensor(spectrogram).clone() for _ in range(BATCH_SIZE)])
+        spectrograms = torch.stack([torch.tensor(spectrogram).clone() for _ in range(self.batch_size)])
 
         #duplicate lables "bATCHES_SIZE" times as torch tensor
-        labels = torch.stack([torch.tensor(label) for _ in range(BATCH_SIZE)])
+        labels = torch.stack([torch.tensor(label) for _ in range(self.batch_size)])
 
         self.index += 1
 

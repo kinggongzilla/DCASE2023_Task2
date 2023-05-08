@@ -23,7 +23,7 @@ wandb.init(
     config = {
     "learning_rate": LEARNING_RATE,
     "epochs": EPOCHS,
-    "batch_size": BATCH_SIZE,
+    "train_batch_size": TRAIN_BATCH_SIZE,
     }
 )
 
@@ -42,12 +42,12 @@ for machine_name in os.listdir(RAW_PATH):
         n_masks_per_spectrogram=N_MASKS_PER_SPECTROGRAM)
     train_loader = torch.utils.data.DataLoader(
         train_set,
-        batch_size=BATCH_SIZE,
+        batch_size=TRAIN_BATCH_SIZE,
         shuffle=True,
-        num_workers=4,
+        num_workers=8,
     )
 
-    test_loader = MachineTestLoader(machine_name)
+    test_loader = MachineTestLoader(machine_name, batch_size=TEST_BATCH_SIZE)
 
     model = UNet()
 
