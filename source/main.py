@@ -64,5 +64,5 @@ for machine_name in os.listdir(RAW_PATH):
 
 print(f"overall_score:{overall_score(RESULT_PATH)}")
 df = metrics_data(RESULT_PATH)
-df.to_csv('results/metrics.csv')
+df.to_csv(os.path.join(RESULT_PATH, 'metrics.csv'))
 
