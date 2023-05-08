@@ -52,7 +52,7 @@ class MachineTrainDataset(Dataset):
         self.n_masks_per_spectrogram = n_masks_per_spectrogram
 
     def __len__(self):
-        return self.length * self.n_masks_per_spectrogram
+        return self.n_spectrograms * self.n_masks_per_spectrogram
 
     def __getitem__(self, index):
         spectrogram_index = index // self.n_masks_per_spectrogram
