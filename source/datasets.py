@@ -45,21 +45,22 @@ def get_spectrogram(spectrogram_file_path):
 
 class MachineTrainDataset(Dataset):
 
-    def __init__(self, machine_name) -> None:
+    def __init__(self, machine_name, n_masks_per_spectrogram) -> None:
         self.spectrograms_folder_path = os.path.join(SPECTROGRAMS_PATH, machine_name, "train")
         self.spectrograms_file_names = sorted(os.listdir(self.spectrograms_folder_path))
-        self.length = len(self.spectrograms_file_names)
+        self.n_spectrograms = len(self.spectrograms_file_names)
+        self.n_masks_per_spectrogram = n_masks_per_spectrogram
 
     def __len__(self):
-        return self.length
+        return self.length * self.n_masks_per_spectrogram
 
     def __getitem__(self, index):
-        spectrogram_file_name = self.spectrograms_file_names[index]
+        spectrogram_index = index // self.n_masks_per_spectrogram
+        spectrogram_file_name = self.spectrograms_file_names[spectrogram_index]
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
         spectrogram = get_spectrogram(spectrogram_file_path)
         mask = random_mask(spectrogram)
         return mask, spectrogram
-
 
 class MachineTestLoader:
     """

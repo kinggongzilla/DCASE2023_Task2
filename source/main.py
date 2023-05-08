@@ -8,7 +8,7 @@ from model import UNet
 from datasets import MachineTrainDataset, MachineTestLoader
 from train import train
 from test import test
-from config import BATCH_SIZE, LEARNING_RATE, RAW_PATH, RESULT_PATH, EPOCHS
+from config import *
 from metrics import metrics_data, overall_score
 
 #start with empty cache
@@ -37,7 +37,9 @@ for machine_name in os.listdir(RAW_PATH):
 
     print(f"Machine: {machine_name}\n")
 
-    train_set = MachineTrainDataset(machine_name)
+    train_set = MachineTrainDataset(
+        machine_name,
+        n_masks_per_spectrogram=N_MASKS_PER_SPECTROGRAM)
     train_loader = torch.utils.data.DataLoader(
         train_set,
         batch_size=BATCH_SIZE,
