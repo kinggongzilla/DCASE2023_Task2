@@ -19,7 +19,6 @@ def test(model, test_loader, machine_name):
     model.to(device)
 
     # Get a sorted list of file names in the relevant directory
-    file_names = sorted(os.listdir(os.path.join(RAW_PATH, machine_name, "test")))
     anomaly_score_path = os.path.join(RESULT_PATH, machine_name, f'anomaly_score_{machine_name}_section_{0}.csv')
     decision_result_path = os.path.join(RESULT_PATH, machine_name, f'decision_result_{machine_name}_section_{0}.csv')
 
@@ -32,9 +31,7 @@ def test(model, test_loader, machine_name):
     reconstr_losses_anomaly = []
     reconstr_losses_normal = []
 
-    for index, (masks, spectrograms, labels) in tqdm(enumerate(test_loader)):
-        if index >= len(file_names):
-            break
+    for index, (masks, spectrograms, labels, spectrogram_file_names) in tqdm(enumerate(test_loader)):
 
         masked_spectrograms = spectrograms.clone()
         masked_spectrograms[masks == 0] = 0
@@ -59,17 +56,17 @@ def test(model, test_loader, machine_name):
             prediction = IS_NORMAL
 
         # Get the filename for the current iteration
-        file_name = file_names[index]
-
+        spectrogram_file_name = spectrogram_file_names[0]
+        raw_file_name = f'{spectrogram_file_name[:-9]}.wav'
 
         # Write the anomaly score and prediction to the CSV files
         with open(anomaly_score_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
-            writer.writerow([file_name, 1/anomaly_score])
+            writer.writerow([raw_file_name, 1/anomaly_score])
 
         with open(decision_result_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
-            writer.writerow([file_name, prediction])
+            writer.writerow([raw_file_name, prediction])
 
     wandb.log({f"{machine_name}_reconstr_loss": np.mean(np.array([reconstr_losses]))})
     wandb.log({f"{machine_name}_reconstr_loss_anomaly": np.mean(np.array([reconstr_losses_anomaly]))})
