@@ -27,6 +27,9 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
+    anomaly_loss_avg = []
+    normal_loss_avg = []
+
     for index, (masks, spectrograms, labels, spectrogram_file_names) in tqdm(enumerate(test_loader)):
 
         masked_spectrograms = spectrograms.clone()
@@ -50,7 +53,7 @@ def test(model, test_loader, machine_name):
         # Write the anomaly score and prediction to the CSV files
         with open(anomaly_score_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
-            writer.writerow([raw_file_name, anomaly_score])
+            writer.writerow([raw_file_name, 1/anomaly_score])
 
         with open(decision_result_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
@@ -58,9 +61,12 @@ def test(model, test_loader, machine_name):
 
         # log loss separately for normal and anomaly
         if labels[0] == IS_ANOMALY:
-            wandb.log({f"{machine_name}_test_loss_anomaly": anomaly_score})
+            anomaly_loss_avg.append(anomaly_score.detach().cpu())
         else:
-            wandb.log({f"{machine_name}_test_loss_normal": anomaly_score})
+            normal_loss_avg.append(anomaly_score.detach().cpu())
+
+    wandb.log({f"{machine_name}_test_loss_anomaly": torch.mean(torch.tensor(anomaly_loss_avg))})
+    wandb.log({f"{machine_name}_test_loss_normal": torch.mean(torch.tensor(normal_loss_avg))})
 
     try:
         accurracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
