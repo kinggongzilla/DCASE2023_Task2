@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from tqdm import tqdm
-from config import EPOCHS, MODEL_PATH, LOG_EVERY
+from config import *
 import os
 import wandb
 from test import test
@@ -19,13 +19,13 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
     model.train()
     model.to(device)
 
-    loss_func = torch.nn.MSELoss()
+    loss_func = torch.nn.MSELoss(reduction='none')
 
     step_count = 0
 
     for epoch in range(EPOCHS):
 
-        for masks, spectrograms, spectrogram_file_names in tqdm(train_loader):
+        for masks, spectrograms, labels, spectrogram_file_names in tqdm(train_loader):
 
             step_count += 1
             optimizer.zero_grad()
@@ -37,11 +37,19 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             targets = spectrograms.to(device)
             outputs = model.forward(inputs)
 
-            batch_loss = loss_func(outputs[masks == 0], targets[masks == 0])
+            unreduced_loss = loss_func(outputs[masks == 0], targets[masks == 0])
+            batch_loss = torch.mean(unreduced_loss.view(-1), dim=0)
             batch_loss.backward()
             optimizer.step()
 
             wandb.log({f"{machine_name}_step_loss": batch_loss}, step=step_count)
+
+
+            # log loss separately for normal and anomaly
+            if labels[0] == IS_ANOMALY:
+                wandb.log({f"{machine_name}_train_loss_anomaly": torch.mean(unreduced_loss[labels == IS_ANOMALY].view(-1), dim=0)})
+            else:
+                wandb.log({f"{machine_name}_train_loss_normal": torch.mean(unreduced_loss[labels == IS_NORMAL].view(-1), dim=0)})
 
             #if step_count % LOG_EVERY == 0:
                 #model.load_state_dict(torch.load(save_path))

@@ -60,7 +60,13 @@ class MachineTrainDataset(Dataset):
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
         spectrogram = get_spectrogram(spectrogram_file_path)
         mask = random_mask(spectrogram)
-        return mask, spectrogram, spectrogram_file_name
+
+        if 'anomaly' in spectrogram_file_name:
+            label = IS_ANOMALY
+        else:
+            label = IS_NORMAL
+
+        return mask, spectrogram, label, spectrogram_file_name
 
 class MachineTestLoader:
     """
@@ -94,9 +100,9 @@ class MachineTestLoader:
 
         #extract label from file name: index=0__segment_id=0__domain=source__label=anomaly.spec.npy
         if 'anomaly' in spectrogram_file_name:
-            label = 1
+            label = IS_ANOMALY
         else:
-            label = 0
+            label = IS_NORMAL
 
         # Convert the list of masked_spectrograms to a torch tensor stacked along 0-dim
         masks = torch.stack([torch.tensor(mask).clone() for mask in masks])

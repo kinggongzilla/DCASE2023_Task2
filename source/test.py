@@ -58,11 +58,9 @@ def test(model, test_loader, machine_name):
 
         # log loss separately for normal and anomaly
         if labels[0] == IS_ANOMALY:
-            print("anomaly")
-            wandb.log({f"{machine_name}_reconstr_loss_anomaly": anomaly_score}, step=index)
+            wandb.log({f"{machine_name}_test_loss_anomaly": anomaly_score})
         else:
-            print("normal")
-            wandb.log({f"{machine_name}_reconstr_loss_normal": anomaly_score}, step=index)
+            wandb.log({f"{machine_name}_test_loss_normal": anomaly_score})
 
     try:
         accurracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)
