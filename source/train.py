@@ -43,12 +43,12 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
 
             wandb.log({f"{machine_name}_step_loss": batch_loss}, step=step_count)
 
-            if step_count % LOG_EVERY == 0:
+            #if step_count % LOG_EVERY == 0:
                 #model.load_state_dict(torch.load(save_path))
                 #model.eval()
                 #model.to(device)
-                test(model, test_loader, machine_name)
-                model.train()
+                #test(model, test_loader, machine_name)
+                #model.train()
 
     torch.save(model.state_dict(), save_path)
 
