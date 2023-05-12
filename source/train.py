@@ -19,7 +19,7 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
     model.train()
     model.to(device)
 
-    loss_func = torch.nn.MSELoss(reduction='none')
+    loss_func = torch.nn.MSELoss()
 
     step_count = 0
 
@@ -37,28 +37,50 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             targets = spectrograms.to(device)
             outputs = model.forward(inputs)
 
-            unreduced_loss = loss_func(outputs[masks == 0], targets[masks == 0])
-            batch_loss = torch.mean(unreduced_loss.view(-1), dim=0)
-            batch_loss.backward()
-            optimizer.step()
+            if step_count % LOG_EVERY == 0:
+                # Split masks/spectrograms by labels (labels == IS_ANOMAL or labels == IS_NORMAL)
+                normal_indices = (labels == IS_NORMAL)
+                anomal_indices = (labels == IS_ANOMALY)
 
-            wandb.log({f"{machine_name}_step_loss": batch_loss}, step=step_count)
+                normal_spectrograms = spectrograms[normal_indices].to(device)
+                anomal_spectrograms = spectrograms[anomal_indices].to(device)
+
+                normal_masks = masks[normal_indices].to(device)
+                anomal_masks = masks[anomal_indices].to(device)
+
+                # Perform forward passes with both normal and anomaly labels
+                normal_outputs = model.forward(normal_spectrograms[normal_masks == 0])
+                anomal_outputs = model.forward(anomal_spectrograms[anomal_masks == 0])
+
+                # Compute and log both average losses
+                train_loss_normal = torch.mean(loss_func(normal_outputs, normal_spectrograms[normal_masks == 0]))
+                train_loss_anomaly = torch.mean(loss_func(anomal_outputs, anomal_spectrograms[anomal_masks == 0]))
+
+                # Log loss separately for normal and anomaly with the step number
+                wandb.log({f"{machine_name}_train_loss_anomaly": train_loss_anomaly}, step=step_count)
+                wandb.log({f"{machine_name}_train_loss_normal": train_loss_normal}, step=step_count)
+
+                # Calculate the average train loss based on the relative label frequency
+                num_normal = normal_indices.sum().float()
+                num_anomaly = anomal_indices.sum().float()
+                train_loss = (num_normal * train_loss_normal + num_anomaly * train_loss_anomaly) / (num_normal + num_anomaly)
+
+            else:
+                train_loss = loss_func(outputs[masks == 0], targets[masks == 0])
+                train_loss.backward()
+                optimizer.step()
+
+            wandb.log({f"{machine_name}_train_loss": train_loss}, step=step_count)
 
 
-            # Calculate mean loss for each sample in the batch
-            mean_loss_per_sample = torch.mean(unreduced_loss.view(TRAIN_BATCH_SIZE, -1), dim=1)
-
-            # Log loss separately for normal and anomaly
-            wandb.log({f"{machine_name}_train_loss_anomaly": torch.mean(mean_loss_per_sample[labels == IS_ANOMALY])})
-            wandb.log({f"{machine_name}_train_loss_normal": torch.mean(mean_loss_per_sample[labels == IS_NORMAL])})
 
 
-#if step_count % LOG_EVERY == 0:
-                #model.load_state_dict(torch.load(save_path))
-                #model.eval()
-                #model.to(device)
-                #test(model, test_loader, machine_name)
-                #model.train()
+        #if step_count % LOG_EVERY == 0:
+                            #model.load_state_dict(torch.load(save_path))
+                            #model.eval()
+                            #model.to(device)
+                            #test(model, test_loader, machine_name)
+                            #model.train()
 
     torch.save(model.state_dict(), save_path)
 
