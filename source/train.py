@@ -45,13 +45,15 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             wandb.log({f"{machine_name}_step_loss": batch_loss}, step=step_count)
 
 
-            # log loss separately for normal and anomaly
-            if labels[0] == IS_ANOMALY:
-                wandb.log({f"{machine_name}_train_loss_anomaly": torch.mean(unreduced_loss[labels == IS_ANOMALY].view(-1), dim=0)})
-            else:
-                wandb.log({f"{machine_name}_train_loss_normal": torch.mean(unreduced_loss[labels == IS_NORMAL].view(-1), dim=0)})
+            # Calculate mean loss for each sample in the batch
+            mean_loss_per_sample = torch.mean(unreduced_loss.view(TRAIN_BATCH_SIZE, -1), dim=1)
 
-            #if step_count % LOG_EVERY == 0:
+            # Log loss separately for normal and anomaly
+            wandb.log({f"{machine_name}_train_loss_anomaly": torch.mean(mean_loss_per_sample[labels == IS_ANOMALY])})
+            wandb.log({f"{machine_name}_train_loss_normal": torch.mean(mean_loss_per_sample[labels == IS_NORMAL])})
+
+
+#if step_count % LOG_EVERY == 0:
                 #model.load_state_dict(torch.load(save_path))
                 #model.eval()
                 #model.to(device)
