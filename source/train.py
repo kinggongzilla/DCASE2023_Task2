@@ -19,7 +19,7 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
     model.train()
     model.to(device)
 
-    loss_func = torch.nn.MSELoss()
+    loss_func = torch.nn.MSELoss(reduction='none')
 
     step_count = 0
 
@@ -37,24 +37,19 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             targets = spectrograms.to(device)
             outputs = model.forward(inputs)
 
+            unreduced_loss = loss_func(outputs[masks == 0], targets[masks == 0])
+
             if step_count % LOG_EVERY == 0:
                 # Split masks/spectrograms by labels (labels == IS_ANOMAL or labels == IS_NORMAL)
                 normal_indices = (labels == IS_NORMAL)
                 anomal_indices = (labels == IS_ANOMALY)
 
-                normal_spectrograms = spectrograms[normal_indices].to(device)
-                anomal_spectrograms = spectrograms[anomal_indices].to(device)
-
-                normal_masks = masks[normal_indices].to(device)
-                anomal_masks = masks[anomal_indices].to(device)
-
-                # Perform forward passes with both normal and anomaly labels
-                normal_outputs = model.forward(normal_spectrograms[normal_masks == 0])
-                anomal_outputs = model.forward(anomal_spectrograms[anomal_masks == 0])
+                normal_loss = unreduced_loss[normal_indices]
+                anomal_loss = unreduced_loss[anomal_indices]
 
                 # Compute and log both average losses
-                train_loss_normal = torch.mean(loss_func(normal_outputs, normal_spectrograms[normal_masks == 0]))
-                train_loss_anomaly = torch.mean(loss_func(anomal_outputs, anomal_spectrograms[anomal_masks == 0]))
+                train_loss_normal = torch.mean(normal_loss)
+                train_loss_anomaly = torch.mean(anomal_loss)
 
                 # Log loss separately for normal and anomaly with the step number
                 wandb.log({f"{machine_name}_train_loss_anomaly": train_loss_anomaly}, step=step_count)
@@ -66,11 +61,13 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
                 train_loss = (num_normal * train_loss_normal + num_anomaly * train_loss_anomaly) / (num_normal + num_anomaly)
 
             else:
-                train_loss = loss_func(outputs[masks == 0], targets[masks == 0])
-                train_loss.backward()
-                optimizer.step()
+                train_loss = torch.mean(unreduced_loss)
+
+            train_loss.backward()
+            optimizer.step()
 
             wandb.log({f"{machine_name}_train_loss": train_loss}, step=step_count)
+
 
 
 
