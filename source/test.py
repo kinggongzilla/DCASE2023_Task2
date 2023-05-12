@@ -58,8 +58,10 @@ def test(model, test_loader, machine_name):
 
         # log loss separately for normal and anomaly
         if labels[0] == IS_ANOMALY:
+            print("anomaly")
             wandb.log({f"{machine_name}_reconstr_loss_anomaly": anomaly_score}, step=index)
         else:
+            print("normal")
             wandb.log({f"{machine_name}_reconstr_loss_normal": anomaly_score}, step=index)
 
     try:
