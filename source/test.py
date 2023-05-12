@@ -50,7 +50,7 @@ def test(model, test_loader, machine_name):
         # Write the anomaly score and prediction to the CSV files
         with open(anomaly_score_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
-            writer.writerow([raw_file_name, 1/anomaly_score])
+            writer.writerow([raw_file_name, anomaly_score])
 
         with open(decision_result_path, 'a', newline='\n') as f:
             writer = csv.writer(f)
