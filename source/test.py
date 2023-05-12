@@ -27,10 +27,6 @@ def test(model, test_loader, machine_name):
     with open(decision_result_path, 'w', newline='\n') as _:
         pass
 
-    reconstr_losses = []
-    reconstr_losses_anomaly = []
-    reconstr_losses_normal = []
-
     for index, (masks, spectrograms, labels, spectrogram_file_names) in tqdm(enumerate(test_loader)):
 
         masked_spectrograms = spectrograms.clone()
@@ -41,14 +37,6 @@ def test(model, test_loader, machine_name):
         outputs = model.forward(inputs)
 
         anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0]).view(-1).sum().item()/len(spectrograms)
-
-        reconstr_losses.append(anomaly_score)
-
-        # log loss separately for normal and anomaly
-        if labels[0] == IS_ANOMALY:
-            reconstr_losses_anomaly.append(anomaly_score)
-        else:
-            reconstr_losses_normal.append(anomaly_score)
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY
@@ -68,9 +56,11 @@ def test(model, test_loader, machine_name):
             writer = csv.writer(f)
             writer.writerow([raw_file_name, prediction])
 
-    wandb.log({f"{machine_name}_reconstr_loss": np.mean(np.array([reconstr_losses]))})
-    wandb.log({f"{machine_name}_reconstr_loss_anomaly": np.mean(np.array([reconstr_losses_anomaly]))})
-    wandb.log({f"{machine_name}_reconstr_loss_normal": np.mean(np.array([reconstr_losses_normal]))})
+        # log loss separately for normal and anomaly
+        if labels[0] == IS_ANOMALY:
+            wandb.log({f"{machine_name}_reconstr_loss_anomaly": anomaly_score}, step=index)
+        else:
+            wandb.log({f"{machine_name}_reconstr_loss_normal": anomaly_score}, step=index)
 
     try:
         accurracy, auc, p_auc, prec, recall, f1 = metrics(anomaly_score_path, decision_result_path)

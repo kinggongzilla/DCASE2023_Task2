@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from tqdm import tqdm
-from config import EPOCHS, MODEL_PATH
+from config import EPOCHS, MODEL_PATH, LOG_EVERY
 import os
 import wandb
 from test import test
@@ -22,11 +22,8 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
     loss_func = torch.nn.MSELoss()
 
     step_count = 0
-    best_loss = 999999999999
 
     for epoch in range(EPOCHS):
-
-        epoch_loss = 0
 
         for masks, spectrograms, spectrogram_file_names in tqdm(train_loader):
 
@@ -43,27 +40,15 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             batch_loss = loss_func(outputs[masks == 0], targets[masks == 0])
             batch_loss.backward()
             optimizer.step()
-            epoch_loss += float(batch_loss.item())
 
-        # normalize epoch_loss by total number of samples
-        epoch_loss = epoch_loss/len(train_loader)
-        wandb.log({f"{machine_name}_epoch_loss": epoch_loss})
+            wandb.log({f"{machine_name}_step_loss": batch_loss}, step=step_count)
 
-
-        #save model if loss is new best loss
-        if epoch_loss < best_loss:
-            best_loss = epoch_loss
-            torch.save(model.state_dict(), save_path)
-        print(f'epoch: {epoch} | loss: {epoch_loss}')
-
-        #log area under the curve every 10 epochs
-        if epoch % 2 == 0:
-            model.load_state_dict(torch.load(save_path))
-            model.eval()
-            model.to(device)
-            test(model, test_loader, machine_name)
-            model.train()
-            
+            if step_count % LOG_EVERY == 0:
+                model.load_state_dict(torch.load(save_path))
+                model.eval()
+                model.to(device)
+                test(model, test_loader, machine_name)
+                model.train()
 
     torch.save(model.state_dict(), save_path)
 
