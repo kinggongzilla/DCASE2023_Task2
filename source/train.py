@@ -28,7 +28,7 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
 
         epoch_loss = 0
 
-        for masks, spectrograms, in tqdm(train_loader):
+        for masks, spectrograms, spectrogram_file_names in tqdm(train_loader):
 
             step_count += 1
             optimizer.zero_grad()

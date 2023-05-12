@@ -38,8 +38,6 @@ def transform_to_spectrogram(in_file_path, out_dir):
     log_mel_spectrogram = 20 * torch.log10(torch.clamp(log_mel_spectrogram, min=1e-5)) - 20
     log_mel_spectrogram = torch.clamp((log_mel_spectrogram + 100) / 100, 0.0, 1.0)
 
-    temp = log_mel_spectrogram[0].numpy()
-
     file_name = os.path.basename(in_file_path)
     np.save(os.path.join(out_dir, f'{file_name[:-4]}.spec.npy'), log_mel_spectrogram.cpu().numpy())
 

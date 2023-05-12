@@ -60,7 +60,7 @@ class MachineTrainDataset(Dataset):
         spectrogram_file_path = os.path.join(self.spectrograms_folder_path, spectrogram_file_name)
         spectrogram = get_spectrogram(spectrogram_file_path)
         mask = random_mask(spectrogram)
-        return mask, spectrogram
+        return mask, spectrogram, spectrogram_file_name
 
 class MachineTestLoader:
     """
