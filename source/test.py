@@ -30,7 +30,7 @@ def test(model, test_loader, machine_name):
     anomaly_loss_avg = []
     normal_loss_avg = []
 
-    for index, (masks, spectrograms, labels, spectrogram_file_names) in tqdm(enumerate(test_loader)):
+    for index, (masks, spectrograms, labels, spectrogram_file_names) in enumerate(test_loader):
 
         masked_spectrograms = spectrograms.clone()
         masked_spectrograms[masks == 0] = 0
@@ -39,7 +39,10 @@ def test(model, test_loader, machine_name):
         targets = spectrograms.to(device)
         outputs = model.forward(inputs)
 
-        anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0]).view(-1).sum().item()/len(spectrograms)
+        if RECONSTRUCT_ONLY_MASKED_AREAS:
+            anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0])
+        else:
+            anomaly_score = loss_func(outputs, targets)
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY
@@ -61,9 +64,9 @@ def test(model, test_loader, machine_name):
 
         # log loss separately for normal and anomaly
         if labels[0] == IS_ANOMALY:
-            anomaly_loss_avg.append(anomaly_score.detach().cpu())
+            anomaly_loss_avg.append(anomaly_score)
         else:
-            normal_loss_avg.append(anomaly_score.detach().cpu())
+            normal_loss_avg.append(anomaly_score)
 
     wandb.log({f"{machine_name}_test_loss_anomaly": torch.mean(torch.tensor(anomaly_loss_avg))})
     wandb.log({f"{machine_name}_test_loss_normal": torch.mean(torch.tensor(normal_loss_avg))})

@@ -37,8 +37,11 @@ def train(model, optimizer, train_loader, test_loader, machine_name):
             targets = spectrograms.to(device)
             outputs = model.forward(inputs)
 
-            # compute loss without reduction
-            train_loss = loss_func(outputs, targets)
+
+            if RECONSTRUCT_ONLY_MASKED_AREAS:
+                train_loss = loss_func(outputs[masks == 0], targets[masks == 0])
+            else:
+                train_loss = loss_func(outputs, targets)
 
             train_loss.backward()
             optimizer.step()
