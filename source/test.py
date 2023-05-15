@@ -31,7 +31,6 @@ def test(model, test_loader, machine_name):
     normal_loss_avg = []
 
     for index, (masks, spectrograms, labels, spectrogram_file_names) in enumerate(test_loader):
-
         masked_spectrograms = spectrograms.clone()
         masked_spectrograms[masks == 0] = 0
 
@@ -40,9 +39,9 @@ def test(model, test_loader, machine_name):
         outputs = model.forward(inputs)
 
         if RECONSTRUCT_ONLY_MASKED_AREAS:
-            anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0])
+            anomaly_score = loss_func(outputs[masks == 0], targets[masks == 0]).item()
         else:
-            anomaly_score = loss_func(outputs, targets)
+            anomaly_score = loss_func(outputs, targets).item()
 
         if anomaly_score > DETECTION_TRESHOLD_DICT[machine_name]:
             prediction = IS_ANOMALY
